@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.biye.cjm.po.UserPO">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+    </resultMap>
+
+    <!--分页查询-->
+    <select id="query" resultType="java.util.Map">
+        select u.id,u.username,r.name role
+        from sys_user u
+        left join sys_user_role s on s.user_id=u.id
+        left join sys_role r on r.id=s.role_id
+        <where>
+            <if test="param!=null and param.username!=null and param.username!=''">
+                u.username like concat('%',#{param.username},'%')
+            </if>
+        </where>
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from sys_user
+        <where>
+            <if test="param!=null and param.username!=null and param.username!=''">
+                username like concat('%',#{param.username},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getUserByUserName" resultType="com.biye.cjm.po.UserPO">
+        select id,username,password
+        from sys_user
+        <where>
+            <if test="username!=null and usermae!=''">
+                username=#{username}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into sys_user(id,username,password)
+        values (#{id,jdbcType=INTEGER},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updatePass">
+        update sys_user
+        set password=#{password}
+        where username=#{username}
+    </update>
+
+</mapper>

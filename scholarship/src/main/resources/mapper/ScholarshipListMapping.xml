@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ScholarshipListMapper">
+
+    <!--查询-->
+    <select id="query" resultType="java.util.Map">
+        select l.mdid,sp.jxjmc,s.xsbh,s.xsxm,s.nj,c.bjmc,p.zymc,d.xymc
+        from scholarshiplist l
+        left join scholarshippublish sp on l.fbid=sp.fbid
+        left join student s on l.xsbh=s.xsbh
+        left join class c on s.bjbh=c.bjbh
+        left join profession p on s.zybh=p.zybh
+        left join department d on s.xybh=d.xybh
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from scholarshiplist
+    </select>
+
+</mapper>

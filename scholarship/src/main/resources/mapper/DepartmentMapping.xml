@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.DepartmentMapper">
+
+    <!--查询-->
+    <select id="query" resultType="com.biye.cjm.dto.DepartmentDTO">
+        select d.xyid,d.xybh,d.xymc,count(p.xybh) sum
+        from department d
+        left join profession p
+        on d.xybh=p.xybh
+        group by d.xybh
+        <if test="sorter!=null and sorter!='' and sorter.field!=null">
+            order by ${sorter.field} ${sorter.order}
+        </if>
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from department
+    </select>
+
+    <!--查询是否存在相同的学院编号-->
+    <select id="hasSameXybh" resultType="java.lang.Boolean">
+        select count(1) from department where XYBH=#{xybh}
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into department(xybh,xymc)
+        values (#{xybh,jdbcType=VARCHAR},#{xymc,jdbcType=VARCHAR})
+    </insert>
+</mapper>

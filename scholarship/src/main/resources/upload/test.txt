@@ -1,0 +1,2 @@
+http://jetbrains-license-server
+http://fls.jetbrains-agent.com

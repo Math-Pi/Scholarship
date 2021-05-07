@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ScholarshipApprovalMapper">
+
+    <!--查询-->
+    <select id="query" resultType="java.util.Map">
+        select a.sqid,a.sqms,a.sqr,a.sqcl,a.path,a.spzt,p.jxjmc
+        from scholarshipapply a
+        left join scholarshippublish p on a.fbid=p.fbid
+        <where>
+            <if test="param!=null and param.jxjmc!=null and param.jxjmc!=''">
+                p.jxjmc like concat('%',#{param.jxjmc},'%')
+            </if>
+            <if test="param!=null and param.spzt!=null">
+                and a.spzt =#{param.spzt}
+            </if>
+            and a.spzt in (1,2,3,4)
+        </where>
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from scholarshipapply a
+        left join scholarshippublish p on a.fbid=p.fbid
+        <where>
+            <if test="param!=null and param.jxjmc!=null and param.jxjmc!=''">
+                p.jxjmc like concat('%',#{param.jxjmc},'%')
+            </if>
+            <if test="param!=null and param.spzt!=null and param.spzt!=''">
+                and a.spzt =#{param.spzt}
+            </if>
+            and a.spzt in (1,2,3,4)
+        </where>
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into scholarshipapproval(spzt,spyj1,sqid)
+        values (#{spzt,jdbcType=INTEGER},#{spyj,jdbcType=VARCHAR},#{sqid,jdbcType=INTEGER})
+    </insert>
+
+    <!--生成获奖名单-->
+    <insert id="create">
+        insert into scholarshiplist(FBID,XSBH)
+         (select FBID,SQR from scholarshipapply where SQID=#{sqid}
+        )
+
+    </insert>
+
+    <!--更新-->
+    <update id="update">
+        update scholarshipapproval
+        <set>
+            <if test="spzt!=null and spzt!=''">
+                spzt=#{spzt,jdbcType=INTEGER},
+            </if>
+            <if test="spyj!=null and spyj!=''">
+                spyj2=#{spyj,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where sqid=#{sqid,jdbcType=INTEGER}
+    </update>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ProfessionMapper">
+
+    <select id="query" resultType="com.biye.cjm.dto.ProfessionDTO">
+        select p.zyid,p.zybh,p.zymc,d.xymc,count(c.zybh) sum
+        from profession p left join department d on p.xybh=d.xybh
+        left join class c on p.zybh=c.zybh
+        group by p.zybh
+        <if test="sorter!=null and sorter!='' and sorter.field!=null">
+            order by ${sorter.field} ${sorter.order}
+        </if>
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from profession
+    </select>
+
+    <insert id="insert">
+        insert into profession(zybh,zymc,xybh)
+        values (#{zybh,jdbcType=VARCHAR},#{zymc,jdbcType=VARCHAR},#{xybh,jdbcType=VARCHAR})
+    </insert>
+</mapper>

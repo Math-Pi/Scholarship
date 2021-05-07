@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ScholarshipDefineMapper">
+
+    <!--实体-表映射-->
+    <resultMap id="BaseResultMap" type="com.biye.cjm.dto.ScholarshipDefineDTO">
+        <result column="DYID" jdbcType="INTEGER" property="dyid" />
+        <result column="LX" jdbcType="VARCHAR" property="lx" />
+        <result column="JLJBDM" jdbcType="INTEGER" property="jljbdm" />
+        <result column="ZJLYDM" jdbcType="INTEGER" property="zjlydm" />
+        <result column="SFFDJ" jdbcType="INTEGER" property="sffdj" />
+        <result column="SFQY" jdbcType="INTEGER" property="sfqy" />
+        <result column="JJMS" jdbcType="VARCHAR" property="jjms" />
+        <result column="FJID" jdbcType="INTEGER" property="fjid" />
+    </resultMap>
+
+    <!--基础字段列表-->
+    <sql id="Base_Column_List">
+        LX,JLJBDM,ZJLYDM,SFFDJ,SFQY,JJMS,FJID
+    </sql>
+
+    <!--条件查询sql-->
+    <sql id="selectCondition">
+        <where>
+            <if test="param!=null and param.lx!=null and param.lx!=''">
+                lx like concat('%',#{param.lx},'%')
+            </if>
+            <if test="param!=null and param.jljbdm!=null">
+                and jljbdm=#{param.jljbdm}
+            </if>
+            <if test="param!=null and param.zjlydm!=null">
+                and zjlydm=#{param.zjlydm}
+            </if>
+            <if test="param!=null and param.sfqy!=null">
+                and sfqy=#{param.sfqy}
+            </if>
+            <if test="param!=null and param.sffdj!=null">
+                and sffdj=#{param.sffdj}
+            </if>
+        </where>
+    </sql>
+
+    <!--分页查询-->
+    <select id="query" resultType="com.biye.cjm.po.ScholarshipDefinePO" resultMap="BaseResultMap">
+        select DYID,LX,JLJBDM,ZJLYDM,SFFDJ,SFQY,JJMS,FJID
+        from scholarshipdefine
+        <include refid="selectCondition" />
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from scholarshipdefine
+        <include refid="selectCondition" />
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into scholarshipdefine(<include refid="Base_Column_List" />)
+        values (#{lx,jdbcType=VARCHAR},
+                #{jljbdm,jdbcType=INTEGER},
+                #{zjlydm,jdbcType=INTEGER},
+                #{sffdj,jdbcType=INTEGER},
+                #{sfqy,jdbcType=INTEGER},
+                #{jjms,jdbcType=VARCHAR},
+                #{fjid,jdbcType=INTEGER}
+        )
+    </insert>
+
+
+    <!--查询启用的奖学金类型列表-->
+    <select id="queryType" resultType="java.util.Map">
+        select dyid,lx from scholarshipdefine where sfqy='1'
+    </select>
+
+    <!--查询是否存在相同的奖学金类型-->
+    <select id="hasSameType" resultType="java.lang.Boolean">
+        select count(1)
+        from scholarshipdefine
+        where LX=#{lx}
+    </select>
+
+    <!--根据主键查询是否分分级-->
+    <select id="querySffdj" resultType="java.lang.Boolean">
+        select SFFDJ from scholarshipdefine where DYID=#{dyid}
+    </select>
+
+</mapper>

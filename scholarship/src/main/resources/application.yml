@@ -1,0 +1,31 @@
+server:
+  port: 8001
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/scholarship?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 下面才是重点，上面是自己的数据库连接信息
+    druid:
+      # 下面为连接池的补充设置，应用到上面所有数据源中
+      # 初始化连接数大小，最小，最大
+      initial-size: 5
+      min-idle: 5
+  resources:
+    static-locations: file:C:\Users\cjm\Desktop\奖学金管理系统\scholarship\src\main\resources
+
+############### Mybatis ###################
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+
+############### showSql ###################
+logging:
+  level:
+    com:
+      biye:
+        cjm:
+          mapper : debug

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ScholarshipPublishMapper">
+
+    <!--实体-表映射-->
+    <resultMap id="BaseResultMap" type="com.biye.cjm.dto.ScholarshipPublishDTO">
+        <result column="FBID" jdbcType="INTEGER" property="fbid" />
+        <result column="DYID" jdbcType="INTEGER" property="dyid" />
+        <result column="JXJMC" jdbcType="VARCHAR" property="jxjmc" />
+        <result column="JXJDJ" jdbcType="VARCHAR" property="jxjdj" />
+        <result column="SQXN" jdbcType="VARCHAR" property="sqxn" />
+        <result column="JXJJE" jdbcType="INTEGER" property="jxjje" />
+        <result column="KSSJ" jdbcType="VARCHAR" property="kssj" />
+        <result column="JSSJ" jdbcType="VARCHAR" property="jssj" />
+        <result column="SFFB" jdbcType="INTEGER" property="sffb" />
+        <result column="JDBZ" jdbcType="VARCHAR" property="jdbz" />
+        <result column="CJBZ" jdbcType="VARCHAR" property="cjbz" />
+    </resultMap>
+
+    <!--基础字段列表-->
+    <sql id="Base_Column_List">
+        DYID,JXJMC,JXJDJ,SQXN,JXJJE,KSSJ,JSSJ,SFFB,JDBZ,CJBZ
+    </sql>
+
+    <!--条件查询sql-->
+    <sql id="selectCondition">
+        <where>
+            <if test="param!=null and param.jxjmc!=null and param.jxjmc!=''">
+                p.jxjmc like concat('%',#{param.jxjmc},'%')
+            </if>
+            <if test="param!=null and param.sqxn!=null and param.sqxn!=''">
+                and p.sqxn =#{param.sqxn}
+            </if>
+            <if test="param!=null and param.jdbz!=null and param.jdbz!=''">
+                and p.jdbz=#{param.jdbz}
+            </if>
+            <if test="param!=null and param.cjbz!=null and param.cjbz!=''">
+                and p.cjbz=#{param.cjbz}
+            </if>
+            <if test="param!=null and param.sffb!=null">
+                and p.sffb=#{param.sffb}
+            </if>
+        </where>
+    </sql>
+
+    <!--分页查询-->
+    <select id="query" resultType="com.biye.cjm.dto.ScholarshipPublishDTO" resultMap="BaseResultMap">
+        select p.fbid,p.dyid,p.jxjmc,p.jxjdj,p.sqxn,p.jxjje,
+        p.kssj,p.jssj,p.sffb,p.jdbz,p.cjbz
+        from scholarshippublish p
+        <include refid="selectCondition" />
+        <if test="sorter!=null and sorter!='' and sorter.field!=null">
+            order by ${sorter.field} ${sorter.order}
+        </if>
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from scholarshippublish p
+        <include refid="selectCondition" />
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into scholarshippublish(<include refid="Base_Column_List" />)
+        values (
+            #{dyid,jdbcType=INTEGER},
+            #{jxjmc,jdbcType=VARCHAR},
+            #{jxjdj,jdbcType=VARCHAR},
+            #{sqxn,jdbcType=VARCHAR},
+            #{jxjje,jdbcType=INTEGER},
+            #{kssj,jdbcType=DATE},
+            #{jssj,jdbcType=DATE},
+            #{sffb,jdbcType=INTEGER},
+            #{jdbz,jdbcType=VARCHAR},
+            #{cjbz,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--更新-->
+    <update id="update">
+        update scholarshippublish
+        <set>
+            <if test="jxjmc!=null and jxjmc!=''">
+                jxjmc=#{jxjmc,jdbcType=VARCHAR},
+            </if>
+            <if test="jxjdj!=null and jxjdj!=''">
+                jxjdj=#{jxjdj,jdbcType=VARCHAR},
+            </if>
+            <if test="sqxn!=null and sqxn!=''">
+                sqxn=#{sqxn,jdbcType=VARCHAR},
+            </if>
+            <if test="jxjje!=null">
+                jxjje=#{jxjje,jdbcType=INTEGER},
+            </if>
+            <if test="kssj!=null ">
+                kssj=#{kssj,jdbcType=DATE},
+            </if>
+            <if test="jssj!=null">
+                jssj=#{jssj,jdbcType=DATE},
+            </if>
+            <if test="sffb!=null">
+                sffb=#{sffb,jdbcType=INTEGER},
+            </if>
+            <if test="jdbz!=null and jdbz!=''">
+                jdbz=#{jdbz,jdbcType=VARCHAR},
+            </if>
+            <if test="cjbz!=null and cjbz!=''">
+                cjbz=#{cjbz,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where fbid=#{fbid}
+    </update>
+
+    <!--查询发布的奖学金名称列表-->
+    <select id="queryName" resultType="java.util.Map">
+        select fbid,jxjmc from scholarshippublish
+        where sffb='1' and date_format(now(),'%Y-%m-%d') between KSSJ and JSSJ
+    </select>
+
+    <!--查询是否存在相同的奖学金名称-->
+    <select id="hasSameName" resultType="java.lang.Boolean">
+        select count(fbid)
+        from scholarshippublish
+        where JXJMC=#{jxjmc}
+    </select>
+
+</mapper>

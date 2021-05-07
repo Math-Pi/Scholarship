@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.ScholarshipApplyMapper">
+
+    <!--查询-->
+    <select id="query" resultType="java.util.Map">
+        select a.sqid,a.sqr,a.sqms,a.sqcl,a.path,a.spzt,s.xsxm as sqr,p.jxjmc
+        from scholarshipapply a
+        left join scholarshippublish p on a.fbid=p.fbid
+        left join student s on a.sqr=s.xsbh
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from scholarshipapply
+    </select>
+
+    <!--查询是否已经申请过同一类型的奖学金-->
+    <select id="hasSameApply" resultType="java.lang.Boolean">
+        select  count(SQID)
+        from scholarshipapply
+        where SQR=#{sqr} and FBID in (
+            select fbid from scholarshippublish where dyid=(select dyid from scholarshippublish where fbid=#{fbid})
+        )
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into scholarshipapply(sqms,sqcl,path,spzt,fbid,sqr)
+        values (#{sqms,jdbcType=VARCHAR},
+                #{sqcl,jdbcType=VARCHAR},
+                #{path,jdbcType=VARCHAR},
+                #{spzt,jdbcType=INTEGER},
+                #{fbid,jdbcType=INTEGER},
+                #{sqr,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--更新-->
+    <update id="alter" parameterType="com.biye.cjm.dto.ScholarshipApplyDTO">
+        update scholarshipapply
+        <set>
+            <if test="sqms!=null and sqms!=''">
+                sqms=#{sqms},
+            </if>
+            <if test="sqcl!=null and sqcl!=''">
+                sqcl=#{sqcl},
+            </if>
+        </set>
+        where sqid=#{sqid}
+    </update>
+
+    <!--批量送审更新审批状态为已提交-->
+    <update id="updateStatus"  parameterType="java.util.List">
+        update scholarshipapply
+        set spzt=1
+        where sqid in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+             ${item}
+        </foreach>
+    </update>
+
+</mapper>

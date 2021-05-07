@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.CommonMapper">
+
+    <!--查询学院列表-->
+    <select id="queryDept" resultType="java.util.Map">
+        select xybh,xymc
+        from department
+    </select>
+
+    <!--查询专业列表-->
+    <select id="queryPro" resultType="java.util.Map">
+        select zybh,zymc
+        from profession
+        <where>
+            <if test="xybh!=null and xybh!=''">
+                xybh=#{xybh}
+            </if>
+        </where>
+    </select>
+
+    <!--查询班级列表-->
+    <select id="queryClass" resultType="java.util.Map">
+        select bjbh,bjmc,nj
+        from class
+        <where>
+            <if test="zybh!=null and zybh!=''">
+                zybh=#{zybh}
+            </if>
+        </where>
+    </select>
+
+    <!--查询规则列表-->
+    <select id="queryRule" resultType="java.util.Map">
+        select gzbh,gzmc
+        from rule
+    </select>
+
+    <!--查询代码映射列表-->
+    <select id="queryLib" resultType="java.util.Map">
+        select dmk,dmv
+        from library
+        <where>
+            <if test="gzbh!=null and gzbh!=''">
+                gzbh=#{gzbh}
+            </if>
+        </where>
+    </select>
+</mapper>

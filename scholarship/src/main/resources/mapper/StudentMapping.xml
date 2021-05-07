@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biye.cjm.mapper.StudentMapper">
+
+    <sql id="Base_Column_List">
+        XSBH,XSXM,XSXB,NJ,XSNL,RXSJ,LXDH,DZ,BZ,BJBH,ZYBH,XYBH
+    </sql>
+
+    <!--条件查询sql-->
+    <sql id="selectCondition">
+        <where>
+            <if test="param!=null and param.xsbh!=null and param.xsbh!=''">
+                and s.xsbh like concat('%',#{param.xsbh},'%')
+            </if>
+            <if test="param!=null and param.bjbh!=null and param.bjbh!=''">
+                and s.bjbh=#{param.bjbh}
+            </if>
+            <if test="param!=null and param.zybh!=null and param.zybh!=''">
+                and s.zybh=#{param.zybh}
+            </if>
+            <if test="param!=null and param.xybh!=null and param.xybh!=''">
+                and s.xybh=#{param.xybh}
+            </if>
+            <if test="param!=null and param.nj!=null and param.nj!=''">
+                and s.nj=#{param.nj}
+            </if>
+        </where>
+    </sql>
+
+    <!--分页查询-->
+    <select id="query" resultType="com.biye.cjm.dto.StudentDTO">
+        select s.xsid,s.xsbh,s.xsxm,s.xsxb,s.nj,s.xsnl,s.rxsj,s.lxdh,s.dz,s.bz,c.bjmc,p.zymc,d.xybh,d.xymc
+        from student s
+        left join class c on s.bjbh=c.bjbh
+        left join profession p on s.zybh=p.zybh
+        left join department d on s.xybh=d.xybh
+        <include refid="selectCondition" />
+        limit ${(pageNo-1)*pageSize},${pageSize}
+    </select>
+
+    <!--查询数据总数-->
+    <select id="total" resultType="java.lang.Integer">
+        select count(1) as total from student s
+        <include refid="selectCondition" />
+    </select>
+
+    <!--插入-->
+    <insert id="insert">
+        insert into student(xsbh,xsxm,xsxb,xsnl,nj,rxsj,lxdh,dz,bz,bjbh,zybh,xybh)
+        values (
+            #{xsbh,jdbcType=VARCHAR},#{xsxm,jdbcType=VARCHAR},#{xsxb,jdbcType=VARCHAR},#{xsnl,jdbcType=VARCHAR},
+            #{nj,jdbcType=VARCHAR},#{rxsj,jdbcType=VARCHAR},#{lxdh,jdbcType=VARCHAR},#{dz,jdbcType=VARCHAR}
+            ,#{bz,jdbcType=VARCHAR},#{bjbh,jdbcType=VARCHAR},#{zybh,jdbcType=VARCHAR},#{xybh,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--更新-->
+    <update id="update">
+        update student
+        <set>
+            <if test="xsbh!=null and xsbh!=''">
+                xsbh=#{xsbh,jdbcType=VARCHAR},
+            </if>
+            <if test="xsxm!=null and xsxm!=''">
+                xsxm=#{xsxm,jdbcType=VARCHAR},
+            </if>
+            <if test="xsxb!=null and xsxb!=''">
+                xsxb=#{xsxb,jdbcType=VARCHAR},
+            </if>
+            <if test="xsnl!=null and xsnl!=''">
+                xsnl=#{xsnl,jdbcType=INTEGER},
+            </if>
+            <if test="nj!=null and nj!=''">
+                nj=#{nj,jdbcType=VARCHAR},
+            </if>
+            <if test="zybh!=null and zybh!=''">
+                zybh=#{zybh,jdbcType=VARCHAR},
+            </if>
+            <if test="xybh!=null and xybh!=''">
+                xybh=#{xybh,jdbcType=VARCHAR},
+            </if>
+            <if test="rxsj!=null">
+                rxsj=#{rxsj,jdbcType=DATE},
+            </if>
+            <if test="lxdh!=null and lxdh!=''">
+                lxdh=#{lxdh,jdbcType=VARCHAR},
+            </if>
+            <if test="dz!=null and dz!=''">
+                dz=#{dz,jdbcType=VARCHAR},
+            </if>
+            <if test="bz!=null and bz!=''">
+                bz=#{bz,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where xsid=#{xsid}
+    </update>
+
+</mapper>
